@@ -12,8 +12,8 @@
 
 using namespace std;
 
-//#define HOWMANY 10000
-#define HOWMANY 1000
+#define HOWMANY 10000
+//#define HOWMANY 1000
 
 // This program employs a "BBP-type" digit extraction scheme to produce hex digits of pi.
 // This code is valid up to ic = 2^24 on systems with IEEE arithmetic.
