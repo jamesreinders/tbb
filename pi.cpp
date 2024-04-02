@@ -25,27 +25,43 @@ using namespace std;
 // https://www.davidhbailey.com/dhbpapers/bbp-formulas.pdf
 //
 
-//#define useCLASS
-#ifdef useCLASS
-class BBP {
+class bbpHexPi {
 private:
-#endif
   static const int ntp = 25;
-  static double tp[ntp]; // tp = power of two table.
+  static constexpr double tp[ntp] = {
+	         1.0, //   0
+	         2.0, //   1
+	         4.0, //   2
+	         8.0, //   3
+	        16.0, //   4
+	        32.0, //   5
+	        64.0, //   6
+	       128.0, //   7
+	       256.0, //   8
+	       512.0, //   9
+	      1024.0, //  10
+	      2048.0, //  11
+	      4096.0, //  12
+	      8192.0, //  13
+	     16384.0, //  14
+	     32768.0, //  15
+	     65536.0, //  16
+	    131072.0, //  17
+	    262144.0, //  18
+	    524288.0, //  19
+	   1048576.0, //  20
+	   2097152.0, //  21
+	   4194304.0, //  22
+	   8388608.0, //  23
+	  16777216.0  //  24
+  };
 
-#ifdef useCLASS
-public:
-#endif
-  void init() {
-    tp[0] = 1.0;
-    for (int i = 1; i < ntp; i++)
-      tp[i] = 2.0 * tp[i-1];
-  }
   
+public:
 //
 // ------- Compute 16^p mod ak
-// This routine uses the left-to-right binary
-// exponentiation scheme.  It is valid for  ak <= 2^24.
+// This routine uses the left-to-right binary exponentiation scheme.
+// It is valid for  ak <= 2^24.
 //
   double expm(double p, double ak) {
     double p1, pt, r;
@@ -136,11 +152,7 @@ public:
     
     return result;
   }
-  
-#ifdef useCLASS
-}; // Class BBP
-#endif
-
+}; // Class bbpHexPi
 
 
 // The existance of "BBP-type formulas" for mathematical constants
@@ -157,27 +169,18 @@ int main(int argc, char **argv)
 {
   auto values = std::vector<unsigned>(HOWMANY);
 
-  for ( auto idx = 1; idx < 129; idx++ ) {
+  for ( auto idx = 1; idx < 9; idx++ ) {
     // Limit the number of threads to two for all oneTBB parallel interfaces
     tbb::global_control global_limit(oneapi::tbb::global_control::max_allowed_parallelism, idx);
     
-#ifdef useCLASS
-    BBP bbp;
-    bbp.init();
-#else
-    init();
-#endif
-
+    bbpHexPi bbp;
+    
     auto t1 =
       chrono::steady_clock::now();  // Start timing
     tbb::parallel_for(tbb::blocked_range<int>(0,values.size()),
 		      [&](tbb::blocked_range<int> r) {
 			for (int i=r.begin(); i<r.end(); ++i) {
-#ifdef useCLASS
 			  values[i] = bbp.EightHexPiDigits(i*8);
-#else
-			  values[i] = EightHexPiDigits(i*8);
-#endif
 			}
 		      });
     auto t2 =
@@ -188,7 +191,7 @@ int main(int argc, char **argv)
     for (unsigned eightdigits : values)
       printf("%.8x", eightdigits);
 
-    printf("\n%4d Time %20f\n",idx,timed);
+    printf("\n%4d Time %20.0f\n",idx,timed);
   
   }
 
