@@ -1,0 +1,16 @@
+Packages:
+	0: Intel Core i7-8665U
+Cores:
+	0: 2 processors (0-1), Intel Kaby Lake
+	1: 2 processors (2-3), Intel Kaby Lake
+	2: 2 processors (4-5), Intel Kaby Lake
+	3: 2 processors (6-7), Intel Kaby Lake
+Logical processors:
+	0: APIC ID 0x00000000
+	1: APIC ID 0x00000001
+	2: APIC ID 0x00000002
+	3: APIC ID 0x00000003
+	4: APIC ID 0x00000004
+	5: APIC ID 0x00000005
+	6: APIC ID 0x00000006
+	7: APIC ID 0x00000007
