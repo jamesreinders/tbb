@@ -1,17 +1,19 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <chrono>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <tbb/info.h>
+#include <tbb/task_arena.h>
+#include <tbb/global_control.h>
 #include <tbb/parallel_for.h>
 
 using namespace std;
 
-
 //#define HOWMANY 10000
 #define HOWMANY 1000
-
 
 // This program employs a "BBP-type" digit extraction scheme to produce hex digits of pi.
 // This code is valid up to ic = 2^24 on systems with IEEE arithmetic.
@@ -154,26 +156,41 @@ public:
 int main(int argc, char **argv)
 {
   auto values = std::vector<unsigned>(HOWMANY);
+
+  for ( auto idx = 1; idx < 129; idx++ ) {
+    // Limit the number of threads to two for all oneTBB parallel interfaces
+    tbb::global_control global_limit(oneapi::tbb::global_control::max_allowed_parallelism, idx);
+    
 #ifdef useCLASS
-  BBP bbp;
-  bbp.init();
+    BBP bbp;
+    bbp.init();
 #else
-  init();
+    init();
 #endif
-  
-  tbb::parallel_for(tbb::blocked_range<int>(0,values.size()),
-		    [&](tbb::blocked_range<int> r) {
-		      for (int i=r.begin(); i<r.end(); ++i) {
+
+    auto t1 =
+      chrono::steady_clock::now();  // Start timing
+    tbb::parallel_for(tbb::blocked_range<int>(0,values.size()),
+		      [&](tbb::blocked_range<int> r) {
+			for (int i=r.begin(); i<r.end(); ++i) {
 #ifdef useCLASS
-			values[i] = bbp.EightHexPiDigits(i*8);
+			  values[i] = bbp.EightHexPiDigits(i*8);
 #else
-			values[i] = EightHexPiDigits(i*8);
+			  values[i] = EightHexPiDigits(i*8);
 #endif
-		      }
-		    });
+			}
+		      });
+    auto t2 =
+      chrono::steady_clock::now();  // Start timing
+    double timed =
+      (chrono::duration_cast<chrono::microseconds>(t2 - t1).count());
+
+    for (unsigned eightdigits : values)
+      printf("%.8x", eightdigits);
+
+    printf("\n%4d Time %20f\n",idx,timed);
   
-  for (unsigned eightdigits : values)
-    printf("%.8x", eightdigits);
-  
+  }
+
   return 0;
 }
