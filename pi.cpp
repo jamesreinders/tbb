@@ -169,7 +169,7 @@ int main(int argc, char **argv)
 {
   auto values = std::vector<unsigned>(HOWMANY);
 
-  for ( auto idx = 1; idx < 9; idx++ ) {
+  for ( auto idx = 1; idx < 225; idx++ ) {
     // Limit the number of threads to two for all oneTBB parallel interfaces
     tbb::global_control global_limit(oneapi::tbb::global_control::max_allowed_parallelism, idx);
     
