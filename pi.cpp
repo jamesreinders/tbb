@@ -171,7 +171,7 @@ int main(int argc, char **argv)
 
   for ( auto idx = 1; idx < 225; idx++ ) {
     // Limit the number of threads to two for all oneTBB parallel interfaces
-    tbb::global_control global_limit(oneapi::tbb::global_control::max_allowed_parallelism, idx);
+    tbb::global_control global_limit(tbb::global_control::max_allowed_parallelism, idx);
     
     bbpHexPi bbp;
     
